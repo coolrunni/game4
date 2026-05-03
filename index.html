@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Nurse Mode: Khushi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      background: #0a0a0a;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    #box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 92%;
+      max-width: 400px;
+      background: rgba(255,255,255,0.06);
+      padding: 20px;
+      border-radius: 18px;
+      backdrop-filter: blur(12px);
+      z-index: 1;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 14px;
+      font-size: 15px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    #dots {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 320px;
+      height: 220px;
+      z-index: 1;
+    }
+
+    .dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      position: absolute;
+      background: rgba(255,255,255,0.3);
+    }
+
+    .special {
+      background: cyan;
+      box-shadow: 0 0 12px cyan;
+    }
+  </style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div id="box">
+  <div id="content"></div>
+</div>
+
+<div id="dots"></div>
+
+<script>
+/* ---------- RESPONSIVE CANVAS ---------- */
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+/* ---------- PARTICLES ---------- */
+let particles = [];
+
+function initParticles() {
+  particles = [];
+  for (let i = 0; i < 50; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 2,
+      dx: (Math.random() - 0.5),
+      dy: (Math.random() - 0.5)
+    });
+  }
+}
+initParticles();
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = "white";
+    ctx.fill();
+
+    p.x += p.dx;
+    p.y += p.dy;
+
+    if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+    if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+  });
+
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* ---------- GAME FLOW ---------- */
+const content = document.getElementById("content");
+const dotsContainer = document.getElementById("dots");
+
+/* Intro */
+function intro() {
+  content.innerHTML = `
+    Hey Khushi 🌙<br><br>
+    Ekta chhoto distraction baniyechi tomake jonno 😊<br><br>
+    Jodi free thako… try korte paro<br><br>
+    <button onclick="stage1()">Start koro 🚀</button>
+  `;
+}
+
+/* Stage 1 */
+function stage1() {
+  content.innerHTML = `
+    Long duty sesh… finally ekto bosle 😮‍💨<br><br>
+    Tokhon ekjon bole:<br>
+    "Didi, ekta question chilo…" 😅<br><br>
+    Ki korbe?
+    <button onclick="wrong()">Ekhon break, pore asun 😄</button>
+    <button onclick="stage2()">Hasi diye sunbo 😌</button>
+    <button onclick="wrong()">Invisible hoye jai 👻</button>
+  `;
+}
+
+/* Stage 2 */
+function stage2() {
+  content.innerHTML = `
+    Patient: "Injection ta beshi lagbe na toh?" 🙂<br><br>
+    <button onclick="wrong()">Kichui lagbe na 😇</button>
+    <button onclick="stage3()">Ektu lagbe, but ami achi 😊</button>
+  `;
+}
+
+/* Stage 3 */
+function stage3() {
+  document.getElementById("box").style.display = "none";
+  dotsContainer.style.display = "block";
+  dotsContainer.innerHTML = "";
+
+  const width = dotsContainer.clientWidth;
+  const height = dotsContainer.clientHeight;
+
+  for (let i = 0; i < 7; i++) {
+    let dot = document.createElement("div");
+    dot.className = "dot";
+
+    dot.style.left = Math.random() * (width - 20) + "px";
+    dot.style.top = Math.random() * (height - 20) + "px";
+
+    if (i === 3) {
+      dot.classList.add("special");
+      dot.onclick = finalStage;
+    } else {
+      dot.onclick = () => alert("Naah 😄 abar try koro!");
+    }
+
+    dotsContainer.appendChild(dot);
+  }
+}
+
+/* Final */
+function finalStage() {
+  dotsContainer.style.display = "none";
+  document.getElementById("box").style.display = "block";
+
+  content.innerHTML = `
+    💙<br><br>
+    Khushi…<br><br>
+    Tomar kaaj ta onek demanding,<br>
+    kintu tumi jeta koro seta genuinely important 🌿<br><br>
+    Ajke bhalo kore nursing research ta koro 📚<br>
+    I know tumi bhalo korbe
+  `;
+}
+
+function wrong() {
+  alert("Ehh 😄 abar try koro!");
+}
+
+/* Start */
+intro();
+</script>
+
+</body>
+</html>
